@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.rakuten.fullstackrecruitmenttest.payload.UploadFileResponse;
-import com.rakuten.fullstackrecruitmenttest.service.FileStorageService;
+import com.rakuten.fullstackrecruitmenttest.service.EmlpFileStorageService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class FileController {
 	private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
 	@Autowired
-	private FileStorageService fileStorageService;
+	private EmlpFileStorageService fileStorageService;
 
 	@PostMapping("/uploadEmployeeRecord")
 	public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile employeeRecordFile) {
