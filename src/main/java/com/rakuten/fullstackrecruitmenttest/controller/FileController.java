@@ -1,5 +1,12 @@
 package com.rakuten.fullstackrecruitmenttest.controller;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,18 +14,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.rakuten.fullstackrecruitmenttest.payload.UploadFileResponse;
+import com.rakuten.fullstackrecruitmenttest.pojo.Employee;
 import com.rakuten.fullstackrecruitmenttest.service.EmlpFileStorageService;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class FileController {
@@ -37,6 +45,12 @@ public class FileController {
 
 		return new UploadFileResponse(fileName, fileDownloadUri, employeeRecordFile.getContentType(),
 				employeeRecordFile.getSize());
+	}
+
+	@PutMapping("/employee/{id}")
+	public Employee updateEmployee(@RequestBody Employee empl, @PathVariable int id) {
+		empl = this.fileStorageService.updateEmployee(id, empl);
+		return empl;
 	}
 
 	@PostMapping("/uploadMultipleEmployee")

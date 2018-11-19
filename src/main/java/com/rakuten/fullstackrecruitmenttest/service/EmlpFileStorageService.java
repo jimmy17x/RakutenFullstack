@@ -29,6 +29,7 @@ import com.rakuten.fullstackrecruitmenttest.exception.FileStorageException;
 import com.rakuten.fullstackrecruitmenttest.exception.MyFileNotFoundException;
 import com.rakuten.fullstackrecruitmenttest.inmemorystore.StoreHouse;
 import com.rakuten.fullstackrecruitmenttest.pojo.Employee;
+import com.rakuten.fullstackrecruitmenttest.util.CSVGenerator;
 import com.rakuten.fullstackrecruitmenttest.util.Constants;
 
 @Service
@@ -51,6 +52,14 @@ public class EmlpFileStorageService {
 		}
 	}
 
+	public StoreHouse getEmplStoreHouse() {
+		return emplStoreHouse;
+	}
+
+	public void setEmplStoreHouse(StoreHouse emplStoreHouse) {
+		this.emplStoreHouse = emplStoreHouse;
+	}
+
 	public String storeFile(MultipartFile file) {
 		// Normalize file name
 		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -66,7 +75,6 @@ public class EmlpFileStorageService {
 			Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
 			addCSVtoEmplStore(file);
-			System.out.println(this.emplStoreHouse);
 			return fileName;
 		} catch (IOException ex) {
 			throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
@@ -76,18 +84,40 @@ public class EmlpFileStorageService {
 	public void addCSVtoEmplStore(MultipartFile file) throws IOException {
 		if (!file.isEmpty()) {
 			BufferedReader fileReader = null;
+			String[] tokens = null;
 			try {
+				// read file
 				fileReader = new BufferedReader(new InputStreamReader(file.getInputStream()));
 				fileReader.readLine();// read header
 				String row = null;
+				// read employee row
 				while ((row = fileReader.readLine()) != null) {
-					String[] tokens = row.split(",");
+					tokens = row.split(",");
+					// validate employee
 					Employee empl = validategAndGetEmployeeFromTokens(tokens);
+					// add employee to in memory store
 					this.emplStoreHouse.addEmployeeToStore(empl);
 				}
-			} finally {
+			} catch (ValidationException validationExcept) {
+				// if validations fails then create an error record entry of malformed tokens
+
+				// add extra column for failure message
+				int currentTokensLen = (tokens != null) ? tokens.length + 1 : 1;
+				String[] malformedTokens = new String[currentTokensLen];
+
+				int i = 0;
+				for (; i < currentTokensLen - 1; ++i) {
+					malformedTokens[i] = tokens[i];
+				}
+				malformedTokens[i] = validationExcept.getMessage();
+
+				this.emplStoreHouse.addToErrorRecords(malformedTokens);
+				throw validationExcept;
+			}
+
+			finally {
 				if (fileReader != null)
-					fileReader.close();
+					fileReader.close(); // close reader
 			}
 		} else {
 			throw new ValidationException("Uploaded file is empty");
@@ -119,6 +149,7 @@ public class EmlpFileStorageService {
 
 		int emplSalary = Integer.parseInt(salary);
 
+		// validate date format
 		SimpleDateFormat sdfrmt = new SimpleDateFormat("yyyy-MM-dd");
 		sdfrmt.setLenient(false);
 		Date joiningDate;
@@ -135,13 +166,41 @@ public class EmlpFileStorageService {
 		try {
 			Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
 			Resource resource = new UrlResource(filePath.toUri());
+
+			try {
+				CSVGenerator csvGen = new CSVGenerator();
+				csvGen.createCSVFile(emplStoreHouse.getEmployeeStore(), emplStoreHouse.getErrorRecords());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			if (resource.exists()) {
 				return resource;
 			} else {
 				throw new MyFileNotFoundException("File not found " + fileName);
 			}
+
 		} catch (MalformedURLException ex) {
 			throw new MyFileNotFoundException("File not found " + fileName, ex);
 		}
+	}
+
+	public Employee updateEmployee(int id, Employee empl) {
+		// TODO Auto-generated method stub
+		String emplTokens[] = new String[Constants.TOTAL_COL];
+		emplTokens[Constants.EMPL_NAME_IDX] = empl.getName();
+		emplTokens[Constants.EMPL_DEPT_IDX] = empl.getDept();
+		emplTokens[Constants.EMPL_DESG_IDX] = empl.getDesignation();
+		emplTokens[Constants.EMPL_SALARY_IDX] = String.valueOf(empl.getSalary());
+
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		String strDate = formatter.format(empl.getJoingingDate());
+		emplTokens[Constants.EMPL_JOINING_DATE_IDX] = strDate;
+
+		empl = validategAndGetEmployeeFromTokens(emplTokens);
+		empl.setEmplId(id);
+		this.emplStoreHouse.updateEmployee(id, empl);
+		return empl;
+
 	}
 }
