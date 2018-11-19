@@ -9,6 +9,19 @@
 	height: 80px;
 }
 
+
+td a{
+	margin : 5px;
+}
+.get-report{
+	background:blue;
+	border-radius:3px;
+	color:white;
+	height:30px;
+	border:0;
+	cursor:pointer;
+}
+
 .app-header {
 	background-color: #222;
 	height: 50px;
