@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ValidationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +38,7 @@ public class FileController {
 	@Autowired
 	private EmlpFileStorageService fileStorageService;
 
+	@CrossOrigin(origins = "*")
 	@PostMapping("/uploadEmployeeRecord")
 	public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile employeeRecordFile) {
 		String fileName = fileStorageService.storeFile(employeeRecordFile);
@@ -47,17 +50,22 @@ public class FileController {
 				employeeRecordFile.getSize());
 	}
 
+	@CrossOrigin(origins = "*")
 	@PutMapping("/employee/{id}")
 	public Employee updateEmployee(@RequestBody Employee empl, @PathVariable int id) {
 		empl = this.fileStorageService.updateEmployee(id, empl);
 		return empl;
 	}
 
+	@CrossOrigin(origins = "*")
 	@PostMapping("/uploadMultipleEmployee")
-	public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
+	public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("filepond") MultipartFile[] files) {
+		if (files.length == 0)
+			throw new ValidationException("No Employee record specified");
 		return Arrays.asList(files).stream().map(file -> uploadFile(file)).collect(Collectors.toList());
 	}
 
+	@CrossOrigin(origins = "*")
 	@GetMapping("/downloadEmployeeRecord/{fileName:.+}")
 	public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
 		// Load file as Resource
@@ -79,5 +87,11 @@ public class FileController {
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
 				.body(resource);
+	}
+
+	@CrossOrigin(origins = "*")
+	@GetMapping("/allemployees")
+	public List<Employee> getAllEmpl(HttpServletRequest request) {
+		return this.fileStorageService.getEmplStoreHouse().getEmployeeStore();
 	}
 }
