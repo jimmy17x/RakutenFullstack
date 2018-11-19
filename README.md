@@ -1,32 +1,37 @@
-# full-stack-recruitment-test
-Basic project structure for full stack web application
 
-Client implementation:
+Started on : November 18 , 9:00PM Indian Standard Time
+Completed V1 : Novemeber 19 , 8:10PM Indian Standard Time
 
-We'd like you to use React. On top of that, use whatever front-end libraries you feel comfortable with.
 
-We've set you up with a build on create-react-app. To run the client:
+Developer comments on current version :
 
-npm install
+Pagination payload contains all records .Can be brough in chunks by also using server side pagination
+The UPDATE logic for an employee is exposed via only a REST API , example request with employee id 3 :
 
-npm start - start the client development build at http://localhost:3000
+curl -X PUT \
+  http://localhost:8080/employee/3 \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -H 'postman-token: b07fa148-e34e-2966-c705-27dd3e69561d' \
+  -d '{
+	"name":"somename",
+	"dept":"tech",
+	"designation":"CEO",
+	"salary":"12",
+	"joingingDate":"2018-08-14"
+}	'
 
-Server implementation:
 
-We'd like you to use Spring Boot for server implementation.
+The "Download All EMployees Report " button in UI contains both succesfull records submitted and records having errors during submission with error message
 
-We've set you up with a basic spring boot application structure. 
+The employee records are being stored in memory as of now in List<>
 
-To run the server:
 
-mvn clean install
 
-mvn spring-boot:run
+Scope of Improvements : 
+Generic Design
+Code refactoring
+CSS Styling
 
-Submission Guidelines:
+Screenshot :
 
-Please submit your solution by sending a zip file to your Rakuten contact.
-
-The zip file should be named {yourname}.zip, and should itself contain the full-stack-recruitment-test project folder with your submission.
-
-The zip file should not include the node_modules and target folder.

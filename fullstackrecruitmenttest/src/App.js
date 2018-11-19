@@ -52,7 +52,7 @@ class App extends Component {
     		  </header>
     		  <FilePond  allowMultiple={true} server="http://localhost:8080/uploadMultipleEmployee"/>
     			<form method = "get" action="http://localhost:8080/downloadEmployeeRecord/AllEmployeeRecords.csv">
-    			<input className = "get-report" type="submit" value="Download All Employee report"/>
+    			<input className = "get-report" type="submit" value="Download All Employees report"/>
     		  </form>
     		   {this.renderTable()}
     		</div>
