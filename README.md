@@ -12,14 +12,21 @@ curl -X PUT \
   http://localhost:8080/employee/3 \
   -H 'cache-control: no-cache' \
   -H 'content-type: application/json' \
-  -H 'postman-token: b07fa148-e34e-2966-c705-27dd3e69561d' \
   -d '{
 	"name":"somename",
 	"dept":"tech",
 	"designation":"CEO",
 	"salary":"12",
 	"joingingDate":"2018-08-14"
-}	'
+}'
+
+Getting all records CSV file :
+curl -X GET \
+  http://localhost:8080/downloadEmployeeRecord/AllEmployeeRecords.csv \
+  -H 'cache-control: no-cache' \
+  
+ Uploading multiple (or single)  file :
+ 
 
 
 The "Download All Employees Report " button in UI contains both succesfull records submitted and records having errors during submission with error message
