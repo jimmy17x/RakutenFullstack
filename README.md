@@ -22,15 +22,15 @@ curl -X PUT \
 }	'
 
 
-The "Download All EMployees Report " button in UI contains both succesfull records submitted and records having errors during submission with error message
+The "Download All Employees Report " button in UI contains both succesfull records submitted and records having errors during submission with error message
 
 The employee records are being stored in memory as of now in List<>
 
-
+The joining date in UI table is Time stamp with because of Date object conversion but the date part and reports is of exact requuired format. 
 
 Scope of Improvements : 
-Generic Design
-Code refactoring
+Generic Design for CSV writer and services
+Code refactoring in both UI and Backend
 CSS Styling
 
 Screenshot :
