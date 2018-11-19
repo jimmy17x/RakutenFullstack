@@ -34,4 +34,6 @@ Code refactoring
 CSS Styling
 
 Screenshot :
+![UI](https://raw.githubusercontent.com/jimmy17x/RakutenFullstack/master/UI%20screensot.png)
+
 
